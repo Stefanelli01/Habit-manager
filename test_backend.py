@@ -1,38 +1,15 @@
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from src.crud import create_habit, get_all_habits, mark_habit_completed
-from src.database import get_db_connection, init_db
+from src.database.crud import create_habit, get_all_habits, mark_habit_completed
+from src.database.database import get_db_connection, init_db
 from src.streak import calculate_streak
 
+
 def run_tests():
-
-    print("Starting DB")
     init_db()
-
-    print("\n2. Creating test habit")
-
-
-    try:
-        a = input("What is habit? ")
-        b = input("What is description of habit? ")
-
-        create_habit(a, b)
-
-    except ValueError as e:
-        print(e)
-
-    print("\n3. Searching habits")
-
+    create_habit("Read Books", "Read 10 pages daily")
     habits = get_all_habits()
-
-    print(f"Cadastred Habits: {[dict(h) for h in habits]}")
 
     if habits:
         habit_id = habits[0]["id"]
-
-        print(f"\n4. Finishing habit: {habit_id}")
-
         mark_habit_completed(habit_id)
 
         conn = get_db_connection()
@@ -45,8 +22,7 @@ def run_tests():
         conn.close()
 
         streak = calculate_streak(logs)
-        print(f"\n5. History: {logs}")
-        print(f"6. Streak: {streak} dia(s)")
+        print(f"Habit ID {habit_id} current streak: {streak}")
 
 
 if __name__ == "__main__":

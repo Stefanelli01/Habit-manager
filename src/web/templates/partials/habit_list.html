@@ -1,0 +1,26 @@
+<div id="habit-list">
+    {% if not habits %}
+        <p>No habits registered yet. Create one above!</p>
+    {% endif %}
+
+    {% for habit in habits %}
+        <div class="card {% if habit.completed_today %}completed{% endif %}">
+            <div>
+                <strong>{{ habit.name }}</strong>
+                {% if habit.description %}<p style="margin: 4px 0 0; color: #666; font-size: 0.9em;">{{ habit.description }}</p>{% endif %}
+                <span class="streak">Streak: {{ habit.streak }} day(s)</span>
+            </div>
+            <div>
+                {% if habit.completed_today %}
+                    <button disabled>Done Today</button>
+                {% else %}
+                    <button hx-post="/habits/{{ habit.id }}/complete"
+                            hx-target="#habit-list"
+                            hx-swap="outerHTML">
+                        Done Today
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Manager</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
+        .card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .completed { background-color: #f0fff0; border-color: #b7eb8f; }
+        form { margin-bottom: 20px; display: flex; gap: 10px; }
+        input[type="text"] { padding: 8px; flex: 1; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 16px; background-color: #0070f3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .streak { font-weight: bold; color: #d97706; }
+    </style>
+</head>
+<body>
+
+    <h1>Habit Manager</h1>
+
+    <form hx-post="/habits" hx-target="#habit-list" hx-swap="outerHTML">
+        <input type="text" name="name" placeholder="Habit name..." required>
+        <input type="text" name="description" placeholder="Description (optional)">
+        <button type="submit">Add Habit</button>
+    </form>
+
+    <h2>Your Habits</h2>
+
+    <div id="habit-list">
+        {% include "partials/habit_list.html" %}
+    </div>
+
+</body>
+</html>
