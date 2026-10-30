@@ -1,5 +1,8 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from src.crud import create_habit, get_all_habits, mark_habit_completed
-from src.database.database import get_db_connection, init_db
+from src.database import get_db_connection, init_db
 from src.streak import calculate_streak
 
 def run_tests():

@@ -1,4 +1,4 @@
-from database import get_db_connection
+from src.database import get_db_connection
 from datetime import date
 
 def create_habit(name: str, description: str = ""):
@@ -7,7 +7,7 @@ def create_habit(name: str, description: str = ""):
 
     try:
         cursor.execute(
-            "INSERT INTO habit(name, description) VALUES(?, ?)",
+            "INSERT INTO habits(name, description) VALUES(?, ?)",
             (name, description)
         )
         conn.commit()

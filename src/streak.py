@@ -2,7 +2,7 @@ from datetime import datetime, date, timedelta
 
 def calculate_streak(completed_dates_str: list[str]) -> int:
 
-    if not completed_dates_src:
+    if not completed_dates_str:
         return 0
 
     completed_dates = [
