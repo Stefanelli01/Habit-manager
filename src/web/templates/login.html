@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+    </script>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Habit Tracker</h1>
+            <p>Cultive sua rotina de forma simples e constante.</p>
+        </div>
+
+        <div class="auth-card">
+            <h2 class="auth-title">Entrar</h2>
+            <form action="/login" method="post" class="auth-form">
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Nome de usuário" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Senha" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-primary">Entrar na Conta</button>
+            </form>
+
+            <hr class="auth-divider">
+
+            <h2 class="auth-title">Criar Conta</h2>
+            <form action="/register" method="post" class="auth-form">
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Escolha um nome de usuário" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Escolha uma senha" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-secondary">Cadastrar Novo Usuário</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Habit Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+    </script>
+</head>
+<body>
+
+    <div class="nav-bar">
+        <h2>Settings</h2>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/settings">⚙️ Settings</a>
+            <a href="/logout" style="color: var(--accent-red);">Logout</a>
+        </div>
+    </div>
+
+    <div class="settings-card">
+        <h3>Appearance</h3>
+        <p style="color: var(--text-muted);">Choose your preferred color theme for Habit Manager.</p>
+
+        <div style="display: flex; gap: 16px; margin-top: 20px;">
+            <button class="btn-primary" onclick="setTheme('dark')">🌙 Dark Mode</button>
+            <button class="btn-primary" onclick="setTheme('light')" style="background: #e4e4e7; color: #09090b;">☀️ Light Mode</button>
+        </div>
+    </div>
+
+    <script>
+        function setTheme(themeName) {
+            localStorage.setItem('theme', themeName);
+            document.documentElement.setAttribute('data-theme', themeName);
+        }
+    </script>
+</body>
+</html>

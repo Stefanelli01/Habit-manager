@@ -3,18 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Manager</title>
+    <title>Habit Tracker - Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+    </script>
 </head>
 <body>
 
-    <h1>Habit Tracker</h1>
+    <div class="nav-bar">
+        <h2>Habit Tracker</h2>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/settings">⚙️ Settings</a>
+            <a href="/logout" style="color: var(--accent-red);">Logout</a>
+        </div>
+    </div>
 
-    <form class="card-form" hx-post="/habits" hx-target="#habit-list" hx-swap="outerHTML" hx-on::after-request="this.reset()">
-        <div class="form-group">
-            <input type="text" name="name" placeholder="Habit title (e.g. Daily Workout)" required style="flex: 2;">
-            <input type="text" name="description" placeholder="Short description" style="flex: 3;">
+    <form class="habit-form" hx-post="/habits" hx-target="#habit-list" hx-swap="outerHTML" hx-on::after-request="this.reset()">
+        <div class="form-row-desktop">
+            <input type="text" name="name" placeholder="Habit title..." required>
+            <input type="text" name="description" placeholder="Description (optional)">
             <button type="submit" class="btn-primary">Add Habit</button>
         </div>
     </form>
