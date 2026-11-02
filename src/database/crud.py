@@ -65,17 +65,26 @@ def get_all_habits_by_user(user_id: int) -> list:
     return habits
 
 
-def mark_habit_completed(habit_id: int, completion_date: str = None) -> None:
-    if completion_date is None:
-        completion_date = str(date.today())
-
+def toggle_habit_completed(habit_id: int, completion_date: str) -> None:
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO habit_logs (habit_id, completed_at) VALUES (?, ?)",
+            "SELECT id FROM habit_logs WHERE habit_id = ? AND completed_at = ?",
             (habit_id, completion_date),
         )
+        existing = cursor.fetchone()
+
+        if existing:
+            cursor.execute(
+                "DELETE FROM habit_logs WHERE habit_id = ? AND completed_at = ?",
+                (habit_id, completion_date),
+            )
+        else:
+            cursor.execute(
+                "INSERT INTO habit_logs (habit_id, completed_at) VALUES (?, ?)",
+                (habit_id, completion_date),
+            )
         conn.commit()
     finally:
         conn.close()

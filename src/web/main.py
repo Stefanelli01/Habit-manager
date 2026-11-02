@@ -12,7 +12,7 @@ from src.database.crud import (
     create_user,
     delete_habit,
     get_all_habits_by_user,
-    mark_habit_completed,
+    toggle_habit_completed,
 )
 from src.database.database import get_db_connection, init_db
 from src.streak import calculate_streak
@@ -32,13 +32,12 @@ templates = Jinja2Templates(directory="src/web/templates")
 app.mount("/static", StaticFiles(directory="src/web/static"), name="static")
 
 PALETTES = [
-    {"bg": "#6366f1", "icon_bg": "rgba(99, 102, 241, 0.15)"},
-    {"bg": "#f97316", "icon_bg": "rgba(249, 115, 22, 0.15)"},
-    {"bg": "#ec4899", "icon_bg": "rgba(236, 72, 153, 0.15)"},
-    {"bg": "#06b6d4", "icon_bg": "rgba(6, 182, 212, 0.15)"},
-    {"bg": "#a855f7", "icon_bg": "rgba(168, 85, 247, 0.15)"},
     {"bg": "#10b981", "icon_bg": "rgba(16, 185, 129, 0.15)"},
-    {"bg": "#eab308", "icon_bg": "rgba(234, 179, 8, 0.15)"},
+    {"bg": "#059669", "icon_bg": "rgba(5, 150, 105, 0.15)"},
+    {"bg": "#34d399", "icon_bg": "rgba(52, 211, 153, 0.15)"},
+    {"bg": "#14b8a6", "icon_bg": "rgba(20, 184, 166, 0.15)"},
+    {"bg": "#065f46", "icon_bg": "rgba(6, 95, 70, 0.2)"},
+    {"bg": "#10b981", "icon_bg": "rgba(16, 185, 129, 0.15)"},
 ]
 
 
@@ -184,7 +183,7 @@ async def complete_habit(
     request: Request, habit_id: int, date_str: str = Form(...)
 ):
     user_id = get_current_user_id(request)
-    mark_habit_completed(habit_id, date_str)
+    toggle_habit_completed(habit_id, date_str)
     habits, days_strip = fetch_habits_with_grid(user_id)
     return templates.TemplateResponse(
         request=request,

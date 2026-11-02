@@ -34,9 +34,13 @@
                 <form hx-post="/habits/{{ habit.id }}/complete" hx-target="#habit-list" hx-swap="outerHTML" style="display: contents;">
                     <input type="hidden" name="date_str" value="{{ day.date }}">
                     <button type="submit"
-                            class="day-box"
+                            class="day-box {% if day.completed %}completed{% endif %}"
                             style="{% if day.completed %}background: {{ habit.color }};{% endif %}"
                             title="{{ day.date }}">
+                        <span>{{ day.date.split('-')[2] }}</span>
+                        {% if day.completed %}
+                            <span class="check-symbol">✓</span>
+                        {% endif %}
                     </button>
                 </form>
             {% endfor %}
