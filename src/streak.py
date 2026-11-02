@@ -1,7 +1,7 @@
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
+
 
 def calculate_streak(completed_dates_str: list[str]) -> int:
-
     if not completed_dates_str:
         return 0
 
@@ -23,7 +23,6 @@ def calculate_streak(completed_dates_str: list[str]) -> int:
         if current_date == expected_date:
             streak += 1
             expected_date -= timedelta(days=1)
-
         elif current_date < expected_date:
             break
 

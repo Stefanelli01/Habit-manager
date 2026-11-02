@@ -38,3 +38,13 @@ def mark_habit_completed(habit_id: int, completion_date: str = None) -> None:
         conn.commit()
     finally:
         conn.close()
+
+
+def delete_habit(habit_id: int) -> None:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM habits WHERE id = ?", (habit_id,))
+        conn.commit()
+    finally:
+        conn.close()

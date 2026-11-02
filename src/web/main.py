@@ -6,7 +6,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.database.crud import create_habit, get_all_habits, mark_habit_completed
+from src.database.crud import (
+    create_habit,
+    delete_habit,
+    get_all_habits,
+    mark_habit_completed,
+)
 from src.database.database import get_db_connection, init_db
 from src.streak import calculate_streak
 
@@ -75,6 +80,17 @@ async def add_habit(
 @app.post("/habits/{habit_id}/complete", response_class=HTMLResponse)
 async def complete_habit(request: Request, habit_id: int):
     mark_habit_completed(habit_id)
+    habits = fetch_habits_with_streaks()
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/habit_list.html",
+        context={"habits": habits},
+    )
+
+
+@app.delete("/habits/{habit_id}", response_class=HTMLResponse)
+async def remove_habit(request: Request, habit_id: int):
+    delete_habit(habit_id)
     habits = fetch_habits_with_streaks()
     return templates.TemplateResponse(
         request=request,

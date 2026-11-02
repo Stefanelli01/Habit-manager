@@ -12,7 +12,7 @@
                 {% endif %}
                 <span class="streak-badge">🔥 {{ habit.streak }} day streak</span>
             </div>
-            <div>
+            <div style="display: flex; gap: 8px; align-items: center;">
                 {% if habit.completed_today %}
                     <button class="btn-done" disabled>✓ Completed Today</button>
                 {% else %}
@@ -23,6 +23,14 @@
                         Check In
                     </button>
                 {% endif %}
+
+                <button class="btn-delete"
+                        hx-delete="/habits/{{ habit.id }}"
+                        hx-target="#habit-list"
+                        hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to delete this habit?">
+                    🗑️
+                </button>
             </div>
         </div>
     {% endfor %}
