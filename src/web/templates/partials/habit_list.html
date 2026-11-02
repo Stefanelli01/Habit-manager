@@ -1,39 +1,53 @@
-<div id="habit-list" class="habit-grid">
+<div id="habit-list" class="grid-container">
+    <div class="grid-header">
+        <div>Habit</div>
+        {% for d in days_strip %}
+            <div class="day-col-header">
+                <div>{{ d.strftime('%a') }}</div>
+                <div style="font-size: 0.9rem; color: var(--text-main);">{{ d.strftime('%d') }}</div>
+            </div>
+        {% endfor %}
+        <div></div>
+    </div>
+
     {% if not habits %}
-        <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; margin-top: 20px;">
-            No habits registered yet. Create your first habit above!
-        </p>
+        <p style="color: var(--text-muted); text-align: center; padding: 40px 0;">No habits found. Create your first habit above!</p>
     {% endif %}
 
     {% for habit in habits %}
-        <div class="habit-card">
-            <div>
-                <h4 style="margin: 0;">{{ habit.name }}</h4>
-                {% if habit.description %}
-                    <p style="margin: 4px 0; font-size: 0.85rem; color: var(--text-muted);">{{ habit.description }}</p>
-                {% endif %}
-                <span style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 600;">🔥 {{ habit.streak }} day streak</span>
+        <div class="habit-row">
+            <div class="habit-meta">
+                <div class="habit-badge-icon" style="background: {{ habit.icon_bg }}; color: {{ habit.color }};">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div class="habit-title-box">
+                    <h4>{{ habit.name }}</h4>
+                    {% if habit.description %}
+                        <p>{{ habit.description }}</p>
+                    {% else %}
+                        <p>🔥 {{ habit.streak }} day streak</p>
+                    {% endif %}
+                </div>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                {% if habit.completed_today %}
-                    <button class="btn-check done" disabled>✓</button>
-                {% else %}
-                    <button class="btn-check"
-                            hx-post="/habits/{{ habit.id }}/complete"
-                            hx-target="#habit-list"
-                            hx-swap="outerHTML">
-                        ✓
-                    </button>
-                {% endif %}
 
-                <button class="btn-del"
-                        hx-delete="/habits/{{ habit.id }}"
-                        hx-target="#habit-list"
-                        hx-swap="outerHTML"
-                        hx-confirm="Delete this habit?">
-                    ✕
-                </button>
-            </div>
+            {% for day in habit.grid_days %}
+                <form hx-post="/habits/{{ habit.id }}/complete" hx-target="#habit-list" hx-swap="outerHTML" style="display: contents;">
+                    <input type="hidden" name="date_str" value="{{ day.date }}">
+                    <button type="submit"
+                            class="day-box"
+                            style="{% if day.completed %}background: {{ habit.color }};{% endif %}"
+                            title="{{ day.date }}">
+                    </button>
+                </form>
+            {% endfor %}
+
+            <button class="btn-del"
+                    hx-delete="/habits/{{ habit.id }}"
+                    hx-target="#habit-list"
+                    hx-swap="outerHTML"
+                    hx-confirm="Delete habit?">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
         </div>
     {% endfor %}
 </div>

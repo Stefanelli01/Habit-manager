@@ -1,7 +1,7 @@
 import os
 from contextlib import asynccontextmanager
-from datetime import date
-from fastapi import FastAPI, Form, Request, Response
+from datetime import date, timedelta
+from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -31,34 +31,61 @@ app = FastAPI(title="Habit Manager", lifespan=lifespan)
 templates = Jinja2Templates(directory="src/web/templates")
 app.mount("/static", StaticFiles(directory="src/web/static"), name="static")
 
+PALETTES = [
+    {"bg": "#6366f1", "icon_bg": "rgba(99, 102, 241, 0.15)"},
+    {"bg": "#f97316", "icon_bg": "rgba(249, 115, 22, 0.15)"},
+    {"bg": "#ec4899", "icon_bg": "rgba(236, 72, 153, 0.15)"},
+    {"bg": "#06b6d4", "icon_bg": "rgba(6, 182, 212, 0.15)"},
+    {"bg": "#a855f7", "icon_bg": "rgba(168, 85, 247, 0.15)"},
+    {"bg": "#10b981", "icon_bg": "rgba(16, 185, 129, 0.15)"},
+    {"bg": "#eab308", "icon_bg": "rgba(234, 179, 8, 0.15)"},
+]
+
 
 def get_current_user_id(request: Request):
     user_id = request.cookies.get("user_id")
     return int(user_id) if user_id and user_id.isdigit() else None
 
 
-def fetch_habits_with_streaks(user_id: int):
+def fetch_habits_with_grid(user_id: int):
     habits = get_all_habits_by_user(user_id)
-    habits_list = []
-    today_str = str(date.today())
+    today = date.today()
+    days_strip = [(today - timedelta(days=i)) for i in range(6, -1, -1)]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    for habit in habits:
+    habits_list = []
+    for idx, habit in enumerate(habits):
         habit_dict = dict(habit)
+
         cursor.execute(
             "SELECT completed_at FROM habit_logs WHERE habit_id = ? ORDER BY completed_at DESC",
             (habit_dict["id"],),
         )
-        logs = [row["completed_at"] for row in cursor.fetchall()]
+        logs = set(row["completed_at"] for row in cursor.fetchall())
 
-        habit_dict["streak"] = calculate_streak(logs)
-        habit_dict["completed_today"] = today_str in logs
+        color_theme = PALETTES[idx % len(PALETTES)]
+        habit_dict["color"] = color_theme["bg"]
+        habit_dict["icon_bg"] = color_theme["icon_bg"]
+
+        grid_days = []
+        for d in days_strip:
+            d_str = str(d)
+            grid_days.append(
+                {
+                    "date": d_str,
+                    "is_today": d == today,
+                    "completed": d_str in logs,
+                }
+            )
+
+        habit_dict["grid_days"] = grid_days
+        habit_dict["streak"] = calculate_streak(sorted(list(logs), reverse=True))
         habits_list.append(habit_dict)
 
     conn.close()
-    return habits_list
+    return habits_list, days_strip
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -80,7 +107,6 @@ async def login_submit(
     user = authenticate_user(username, password)
     if user:
         response = RedirectResponse(url="/", status_code=303)
-        # Cookie de sessão (expira ao fechar se não escolher remember_me)
         max_age = 30 * 24 * 60 * 60 if remember_me else None
         response.set_cookie(key="user_id", value=str(user["id"]), max_age=max_age)
         return response
@@ -118,9 +144,11 @@ async def read_dashboard(request: Request):
     if not user_id:
         return RedirectResponse(url="/login", status_code=303)
 
-    habits = fetch_habits_with_streaks(user_id)
+    habits, days_strip = fetch_habits_with_grid(user_id)
     return templates.TemplateResponse(
-        request=request, name="index.html", context={"habits": habits}
+        request=request,
+        name="index.html",
+        context={"habits": habits, "days_strip": days_strip},
     )
 
 
@@ -143,23 +171,25 @@ async def add_habit(
     if user_id and name.strip():
         create_habit(user_id, name.strip(), description.strip())
 
-    habits = fetch_habits_with_streaks(user_id)
+    habits, days_strip = fetch_habits_with_grid(user_id)
     return templates.TemplateResponse(
         request=request,
         name="partials/habit_list.html",
-        context={"habits": habits},
+        context={"habits": habits, "days_strip": days_strip},
     )
 
 
 @app.post("/habits/{habit_id}/complete", response_class=HTMLResponse)
-async def complete_habit(request: Request, habit_id: int):
+async def complete_habit(
+    request: Request, habit_id: int, date_str: str = Form(...)
+):
     user_id = get_current_user_id(request)
-    mark_habit_completed(habit_id)
-    habits = fetch_habits_with_streaks(user_id)
+    mark_habit_completed(habit_id, date_str)
+    habits, days_strip = fetch_habits_with_grid(user_id)
     return templates.TemplateResponse(
         request=request,
         name="partials/habit_list.html",
-        context={"habits": habits},
+        context={"habits": habits, "days_strip": days_strip},
     )
 
 
@@ -167,9 +197,9 @@ async def complete_habit(request: Request, habit_id: int):
 async def remove_habit(request: Request, habit_id: int):
     user_id = get_current_user_id(request)
     delete_habit(user_id, habit_id)
-    habits = fetch_habits_with_streaks(user_id)
+    habits, days_strip = fetch_habits_with_grid(user_id)
     return templates.TemplateResponse(
         request=request,
         name="partials/habit_list.html",
-        context={"habits": habits},
+        context={"habits": habits, "days_strip": days_strip},
     )
