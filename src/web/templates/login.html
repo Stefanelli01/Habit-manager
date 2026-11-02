@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker - Login</title>
+    <title>Habit Tracker - Entrar</title>
     <link rel="stylesheet" href="/static/style.css">
     <script>
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
@@ -18,31 +18,52 @@
         </div>
 
         <div class="auth-card">
-            <h2 class="auth-title">Entrar</h2>
-            <form action="/login" method="post" class="auth-form">
+            <h2 class="auth-title">Entrar na Conta</h2>
+
+            <form action="/login" method="post" class="auth-form" id="login-form">
                 <div class="input-group">
-                    <input type="text" name="username" placeholder="Nome de usuário" required autocomplete="username">
+                    <input type="text" id="username" name="username" placeholder="Nome de usuário" required autocomplete="username">
                 </div>
                 <div class="input-group">
                     <input type="password" name="password" placeholder="Senha" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn-primary">Entrar na Conta</button>
+
+                <div class="remember-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember_me" id="remember-me">
+                        Lembrar do meu usuário
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary">Entrar</button>
             </form>
 
             <hr class="auth-divider">
 
-            <h2 class="auth-title">Criar Conta</h2>
-            <form action="/register" method="post" class="auth-form">
-                <div class="input-group">
-                    <input type="text" name="username" placeholder="Escolha um nome de usuário" required autocomplete="username">
-                </div>
-                <div class="input-group">
-                    <input type="password" name="password" placeholder="Escolha uma senha" required autocomplete="new-password">
-                </div>
-                <button type="submit" class="btn-secondary">Cadastrar Novo Usuário</button>
-            </form>
+            <div class="auth-footer">
+                <p>Ainda não tem uma conta?</p>
+                <a href="/register" class="btn-secondary" style="display: block; text-align: center; text-decoration: none; margin-top: 10px;">Criar nova conta</a>
+            </div>
         </div>
     </div>
 
+    <script>
+        const savedUser = localStorage.getItem('saved_username');
+        const usernameInput = document.getElementById('username');
+        const rememberCheckbox = document.getElementById('remember-me');
+
+        if (savedUser) {
+            usernameInput.value = savedUser;
+            rememberCheckbox.checked = true;
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function() {
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('saved_username', usernameInput.value.trim());
+            } else {
+                localStorage.removeItem('saved_username');
+            }
+        });
+    </script>
 </body>
 </html>

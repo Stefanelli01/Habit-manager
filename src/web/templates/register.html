@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Criar Conta</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+    </script>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Habit Tracker</h1>
+            <p>Comece a organizar seus hábitos hoje mesmo.</p>
+        </div>
+
+        <div class="auth-card">
+            <h2 class="auth-title">Criar Nova Conta</h2>
+
+            <form action="/register" method="post" class="auth-form" onsubmit="return validatePasswords()">
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Escolha um nome de usuário" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Escolha uma senha" required autocomplete="new-password">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme a senha" required autocomplete="new-password">
+                </div>
+
+                <p id="error-msg" style="color: var(--accent-red); font-size: 0.85rem; display: none;">As senhas não coincidem.</p>
+
+                <button type="submit" class="btn-primary" style="margin-top: 8px;">Cadastrar</button>
+            </form>
+
+            <hr class="auth-divider">
+
+            <div class="auth-footer">
+                <p>Já possui uma conta?</p>
+                <a href="/login" class="btn-secondary" style="display: block; text-align: center; text-decoration: none; margin-top: 10px;">Já tenho uma conta</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validatePasswords() {
+            const pass = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            if (pass !== confirm) {
+                errorMsg.style.display = 'block';
+                return false;
+            }
+            errorMsg.style.display = 'none';
+            return true;
+        }
+    </script>
+</body>
+</html>

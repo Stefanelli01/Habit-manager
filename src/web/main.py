@@ -66,24 +66,43 @@ async def login_page(request: Request):
     return templates.TemplateResponse(request=request, name="login.html", context={})
 
 
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse(request=request, name="register.html", context={})
+
+
 @app.post("/login")
-async def login_submit(username: str = Form(...), password: str = Form(...)):
+async def login_submit(
+    username: str = Form(...),
+    password: str = Form(...),
+    remember_me: str = Form(None),
+):
     user = authenticate_user(username, password)
     if user:
         response = RedirectResponse(url="/", status_code=303)
-        response.set_cookie(key="user_id", value=str(user["id"]))
+        # Cookie de sessão (expira ao fechar se não escolher remember_me)
+        max_age = 30 * 24 * 60 * 60 if remember_me else None
+        response.set_cookie(key="user_id", value=str(user["id"]), max_age=max_age)
         return response
     return RedirectResponse(url="/login?error=1", status_code=303)
 
 
 @app.post("/register")
-async def register_submit(username: str = Form(...), password: str = Form(...)):
+async def register_submit(
+    username: str = Form(...),
+    password: str = Form(...),
+    confirm_password: str = Form(...),
+):
+    if password != confirm_password:
+        return RedirectResponse(url="/register?error=mismatch", status_code=303)
+
     if create_user(username, password):
         user = authenticate_user(username, password)
         response = RedirectResponse(url="/", status_code=303)
         response.set_cookie(key="user_id", value=str(user["id"]))
         return response
-    return RedirectResponse(url="/login?error=exists", status_code=303)
+
+    return RedirectResponse(url="/register?error=exists", status_code=303)
 
 
 @app.get("/logout")
